@@ -188,6 +188,13 @@ public class MainActivity extends Activity {
         }
 
         @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            // 必须把所有触摸事件交给 GestureDetector，
+            // 否则单击 / 长按都不会触发。
+            return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
+        }
+
+        @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
             handler.removeCallbacks(ticker);

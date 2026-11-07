@@ -28,7 +28,7 @@
 从 [Releases](../../releases) 下载 APK，或直接使用仓库里的：
 
 ```text
-dist/算算大时钟-v1.1.apk
+dist/算算大时钟-v1.2.apk
 ```
 
 最低支持 Android 5.0（API 21），目标 Android 15（API 35）。
