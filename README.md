@@ -11,6 +11,12 @@
 
 ![icon](docs/icon.png)
 
+## 截图
+
+| 当前时间 | 秒表 |
+|---|---|
+| ![时间](docs/screenshot-clock.jpg) | ![秒表](docs/screenshot-stopwatch.jpg) |
+
 ## 操作方式
 
 | 操作 | 功能 |
@@ -28,7 +34,7 @@
 从 [Releases](../../releases) 下载 APK，或直接使用仓库里的：
 
 ```text
-dist/算算大时钟-v1.2.apk
+dist/算算大时钟-v1.3.apk
 ```
 
 最低支持 Android 5.0（API 21），目标 Android 15（API 35）。

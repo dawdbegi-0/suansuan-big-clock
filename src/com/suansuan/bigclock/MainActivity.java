@@ -13,12 +13,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -129,8 +128,18 @@ public class MainActivity extends Activity {
         private final SharedPreferences prefs;
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Handler handler = new Handler(Looper.getMainLooper());
-        private final GestureDetector gestureDetector;
+        private final int touchSlop;
+        private final Runnable longPressRunnable = new Runnable() {
+            @Override
+            public void run() {
+                longPressFired = true;
+                showColorChoiceDialog();
+            }
+        };
 
+        private float downX;
+        private float downY;
+        private boolean longPressFired = false;
         private int bgColor;
         private int textColor;
 
@@ -165,33 +174,42 @@ public class MainActivity extends Activity {
             setBackgroundColor(bgColor);
             setFocusable(true);
             setClickable(true);
-
-            gestureDetector = new GestureDetector(context,
-                    new GestureDetector.SimpleOnGestureListener() {
-                        @Override
-                        public boolean onDown(MotionEvent e) {
-                            return true;
-                        }
-
-                        @Override
-                        public boolean onSingleTapUp(MotionEvent e) {
-                            tapAction();
-                            return true;
-                        }
-
-                        @Override
-                        public void onLongPress(MotionEvent e) {
-                            performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                            showColorChoiceDialog();
-                        }
-                    });
+            touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         }
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
-            // 必须把所有触摸事件交给 GestureDetector，
-            // 否则单击 / 长按都不会触发。
-            return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    downX = event.getX();
+                    downY = event.getY();
+                    longPressFired = false;
+                    handler.removeCallbacks(longPressRunnable);
+                    handler.postDelayed(longPressRunnable, 550L);
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    if (!longPressFired) {
+                        float dx = event.getX() - downX;
+                        float dy = event.getY() - downY;
+                        if (dx * dx + dy * dy > touchSlop * touchSlop) {
+                            handler.removeCallbacks(longPressRunnable);
+                        }
+                    }
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    handler.removeCallbacks(longPressRunnable);
+                    if (!longPressFired) {
+                        tapAction();
+                    }
+                    longPressFired = false;
+                    return true;
+                case MotionEvent.ACTION_CANCEL:
+                    handler.removeCallbacks(longPressRunnable);
+                    longPressFired = false;
+                    return true;
+                default:
+                    return true;
+            }
         }
 
         @Override
