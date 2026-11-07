@@ -1,0 +1,14 @@
+# build outputs
+build/
+*.keystore
+*.jks
+
+# local preview drafts
+icon_preview/
+
+# editor/os noise
+.DS_Store
+*.swp
+
+# duplicate local apk (release copy lives in dist/)
+/算算大时钟.apk
